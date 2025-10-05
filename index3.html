@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Golden Bean Cafe - Digital Menu</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Define a custom, luxurious color palette for Tailwind and general styling */
+        :root {
+            --color-primary-brown: #3C2F2F; /* Rich Espresso Brown */
+            --color-secondary-cream: #F5F5DC; /* Deep Cream/Beige */
+            --color-accent-gold: #B8860B; /* Muted Gold/Olive */
+            --color-card-bg: #F8F8F0; /* Off-White for cards */
+        }
+        /* Custom scrollbar for subtle aesthetic */
+        .category-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        .category-nav::-webkit-scrollbar-thumb {
+            background-color: var(--color-accent-gold);
+            border-radius: 2px;
+        }
+        .category-nav::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        /* Styles for animated modal entry/exit */
+        .modal-animate-enter {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        .modal-animate-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms ease-out, transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-animate-exit {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 200ms ease-in, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+
+    <script>
+        // Customizing Tailwind to include our defined color palette and fonts
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'espresso': 'var(--color-primary-brown)',
+                        'cream': 'var(--color-secondary-cream)',
+                        'gold-accent': 'var(--color-accent-gold)',
+                        'card-bg': 'var(--color-card-bg)',
+                    },
+                    fontFamily: {
+                        'display': ['Playfair Display', 'serif'], /* For titles and headers */
+                        'sans': ['Inter', 'sans-serif'], /* For body text and menu items */
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-cream font-sans text-espresso selection:bg-gold-accent selection:text-white">
+
+    <!-- Header Section -->
+    <header class="bg-espresso text-cream shadow-xl sticky top-0 z-20 p-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="font-display text-4xl md:text-5xl font-bold tracking-wider mb-1 sm:mb-0">
+                The Golden Bean Cafe
+            </h1>
+            <p class="text-gold-accent font-display italic text-lg opacity-80">
+                A Taste of Pure Luxury.
+            </p>
+        </div>
+    </header>
+
+    <!-- Menu Data Structure (Hidden JSON for easy management) -->
+    <!-- Menu items based strictly on the provided image, categorized into Desserts and Coffee/Beverages. -->
+    <div id="menu-data" class="hidden">
+        [
+            <!-- QUICK BITES (Mapped to Desserts for cafe structure) -->
+            { "category": "Desserts", "name": "Classic Bagel", "price": "₹200", "description": "Freshly baked plain or seeded bagel served toasted with cream cheese or butter.", "ingredients": ["Flour", "Yeast", "Cream Cheese"], "imageUrl": "images/b1.jpg" },
+            { "category": "Desserts", "name": "Chocolate Chip Muffin", "price": "₹225", "description": "A large, freshly baked muffin, available in seasonal flavours like Blueberry or Chocolate Chip.", "ingredients": ["Flour", "Sugar", "Chocolate Chips", "Butter"], "imageUrl": "images/b2.jpg" },
+            { "category": "Desserts", "name": "Gourmet Breakfast Sandwich", "price": "₹475", "description": "Sourdough bread filled with fresh egg, melted cheese, and your choice of premium protein.", "ingredients": ["Sourdough Bread", "Egg", "Cheese", "Protein (Optional)"], "imageUrl": "images/b3.jpg" },
+            { "category": "Desserts", "name": "French Butter Croissant", "price": "₹175", "description": "A classic flaky, buttery French pastry, baked fresh daily. Perfect for a quick, elegant bite.", "ingredients": ["Flour", "Butter", "Yeast"], "imageUrl": "images/b4.jpg" },
+            { "category": "Desserts", "name": "Artisan Scones", "price": "₹225", "description": "Tender, slightly sweet scones served warm with preserves and clotted cream.", "ingredients": ["Flour", "Cream", "Butter", "Sugar", "Jam"], "imageUrl": "images/b5.jpg" },
+
+            <!-- ESPRESSO & HOT (Mapped to Coffee/Beverages) -->
+            { "category": "Coffee/Beverages", "name": "Espresso Shot", "price": "₹200", "description": "A single, intense shot of our signature Golden Bean blend, extracted to perfection.", "ingredients": ["Coffee Beans", "Water"], "imageUrl": "images/b6.webp" },
+            { "category": "Coffee/Beverages", "name": "Macchiato", "price": "₹250", "description": "Espresso marked with a dollop of foamed milk. Simple and intense.", "ingredients": ["Espresso", "Foamed Milk"], "imageUrl": "images/b7.webp" },
+            { "category": "Coffee/Beverages", "name": "Classic Latte", "price": "₹350", "description": "Smooth, velvety steamed milk combined with a shot of rich espresso, topped with a thin layer of foam.", "ingredients": ["Espresso", "Steamed Milk"], "imageUrl": "images/b8.jpg" },
+            { "category": "Coffee/Beverages", "name": "Breve", "price": "₹380", "description": "Espresso mixed with steamed half-and-half (cream and milk) for a rich, luxurious texture.", "ingredients": ["Espresso", "Half-and-Half"], "imageUrl": "images/b9.jpg" },
+            { "category": "Coffee/Beverages", "name": "Signature Mocha", "price": "₹380", "description": "Dark chocolate syrup mixed with espresso and steamed milk, a perfect decadent treat.", "ingredients": ["Espresso", "Milk", "Chocolate Syrup"], "imageUrl": "images/b10.jpg" },
+            { "category": "Coffee/Beverages", "name": "Cappuccino", "price": "₹300", "description": "Equal parts espresso, steamed milk, and airy, foamed milk.", "ingredients": ["Espresso", "Steamed Milk", "Foam"], "imageUrl": "images/b11.jpg" },
+            { "category": "Coffee/Beverages", "name": "Americano", "price": "₹300", "description": "Espresso shots diluted with hot water to give a similar strength to drip coffee.", "ingredients": ["Espresso", "Hot Water"], "imageUrl": "images/b12.jpg" },
+            { "category": "Coffee/Beverages", "name": "Daily Dark Roast", "price": "₹275", "description": "Our featured strong, bold dark roast filter coffee. Deep and aromatic.", "ingredients": ["Dark Roast Coffee", "Water"], "imageUrl": "images/b13.jpg" },
+            { "category": "Coffee/Beverages", "name": "Pour Over Single Origin", "price": "₹325", "description": "Hand-brewed single-origin coffee, highlighting subtle flavors and aromatic notes.", "ingredients": ["Single Origin Beans", "Water"], "imageUrl": "images/b14.jpg" },
+            { "category": "Coffee/Beverages", "name": "Hot Chocolate Deluxe", "price": "₹300", "description": "Rich, thick, decadent hot chocolate made with high-quality cocoa.", "ingredients": ["Milk", "Dark Chocolate", "Sugar"], "imageUrl": "images/b15.jpg" },
+            { "category": "Coffee/Beverages", "name": "Steamer", "price": "₹300", "description": "Steamed milk flavored with your choice of syrup (Vanilla, Hazelnut, etc.). A non-coffee delight.", "ingredients": ["Steamed Milk", "Flavor Syrup"], "imageUrl": "images/b16.jpg" },
+            { "category": "Coffee/Beverages", "name": "Café Au Lait", "price": "₹400", "description": "Strong coffee mixed with an equal amount of hot milk for a balanced, milder brew.", "ingredients": ["Coffee", "Hot Milk"], "imageUrl": "images/b18.jpg" }
+        ]
+    </div>
+
+    <!-- Main Menu Container -->
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+
+        <!-- Category Menu Navigation (Quick Links) -->
+        <nav class="sticky top-16 bg-cream py-3 z-10 shadow-lg border-b border-gold-accent border-opacity-30">
+            <ul id="category-nav" class="category-nav flex overflow-x-auto whitespace-nowrap space-x-6 md:space-x-10 text-sm md:text-base font-semibold px-2 md:px-0">
+                <!-- Links will be populated by JS for Desserts and Coffee/Beverages -->
+            </ul>
+        </nav>
+
+        <!-- Menu Sections (Populated by JS) -->
+        <div id="menu-sections" class="mt-8">
+            <!-- Dynamic menu content will be inserted here -->
+        </div>
+    </main>
+
+    <!-- Footer (Subtle elegance) -->
+    <footer class="bg-espresso text-cream text-center p-6 mt-12">
+        <p class="font-display italic text-lg text-gold-accent mb-2">~ Elegance in Every Sip ~</p>
+        <p class="text-xs opacity-70">&copy; 2025 The Golden Bean Cafe. All Rights Reserved.</p>
+    </footer>
+
+
+    <!-- Item Detail Modal (Hidden by default, transparent overlay) -->
+    <div id="item-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/70 flex items-center justify-center p-4" onclick="closeModal(event)">
+        <!-- Modal Content Box - Centered and small, with animation classes -->
+        <!-- Changed inner background to espresso/90 for visibility -->
+        <div id="modal-content" class="bg-espresso/90 text-cream w-full max-w-sm md:max-w-md mx-auto rounded-xl shadow-2xl transition-all duration-300 modal-animate-enter" onclick="event.stopPropagation()">
+            
+            <!-- Image in Modal Header (No Frame) -->
+             <div id="modal-image-container" class="w-full h-36 overflow-hidden rounded-t-xl">
+                 <img id="modal-item-image" src="" alt="Food item image" class="w-full h-full object-cover">
+             </div>
+
+            <!-- Modal Header (Semi-transparent background changed to gold-accent/90 for better separation, text remains cream) -->
+            <div class="p-4 md:p-6 bg-gold-accent/90 backdrop-blur-sm relative">
+                <h2 id="modal-name" class="font-display text-2xl font-bold text-cream"></h2>
+                <button onclick="closeModal()" class="absolute top-2 right-2 text-cream hover:text-espresso transition duration-200 p-1 rounded-full bg-gold-accent/70">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body (All text set to text-cream/text-gold-accent) -->
+            <div class="p-4 md:p-6 space-y-4">
+                <div>
+                    <!-- Section Title color changed to gold-accent for highlight -->
+                    <h3 class="text-base font-bold font-display text-gold-accent mb-1">Description</h3>
+                    <!-- Description text set to cream -->
+                    <p id="modal-description" class="text-sm md:text-sm text-cream"></p>
+                </div>
+                <div>
+                    <!-- Section Title color changed to gold-accent for highlight -->
+                    <h3 class="text-base font-bold font-display text-gold-accent mb-2">Key Ingredients</h3>
+                    <!-- Ingredient list color changed to cream -->
+                    <ul id="modal-ingredients" class="list-disc list-inside space-y-1 text-sm md:text-sm ml-2 text-cream">
+                        <!-- Ingredients will be inserted here -->
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Modal Footer/Price (Text set to cream) -->
+            <div class="p-4 md:p-6 border-t border-cream border-opacity-30 rounded-b-xl flex justify-between items-center">
+                <span class="text-base font-semibold text-cream">Your Investment:</span>
+                <span id="modal-price" class="text-xl font-bold font-display text-cream"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Menu Rendering and Modal Logic -->
+    <script>
+        const menuDataElement = document.getElementById('menu-data');
+        const menuSectionsContainer = document.getElementById('menu-sections');
+        const categoryNav = document.getElementById('category-nav');
+        const modal = document.getElementById('item-modal');
+        const modalContent = document.getElementById('modal-content');
+        const menuItems = JSON.parse(menuDataElement.textContent);
+        
+        /**
+         * Parses the menu data and groups items by category.
+         * @returns {Object} Grouped menu items.
+         */
+        function groupMenuByCategory(data) {
+            return data.reduce((acc, item) => {
+                const category = item.category;
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(item);
+                return acc;
+            }, {});
+        }
+
+        /**
+         * Opens the modal and populates it with item details, applying animation.
+         */
+        function openModal(item) {
+            document.getElementById('modal-name').textContent = item.name;
+            document.getElementById('modal-description').textContent = item.description;
+            document.getElementById('modal-price').textContent = item.price;
+            document.getElementById('modal-item-image').src = item.imageUrl;
+            
+            const ingredientsList = document.getElementById('modal-ingredients');
+            ingredientsList.innerHTML = '';
+            item.ingredients.forEach(ingredient => {
+                const li = document.createElement('li');
+                li.textContent = ingredient;
+                ingredientsList.appendChild(li);
+            });
+
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // Prevent background scrolling
+            
+            // Apply animation class for entry
+            modalContent.classList.remove('modal-animate-enter-active', 'modal-animate-exit');
+            modalContent.classList.add('modal-animate-enter-active');
+        }
+
+        /**
+         * Closes the modal, applying animation.
+         */
+        function closeModal(event) {
+            // Check if click is on overlay or close button
+            const isOverlayClick = event && event.currentTarget === modal;
+            const isCloseButtonClick = event && event.target.closest('button') === modal.querySelector('button');
+
+            if (!event || isOverlayClick || isCloseButtonClick) {
+                // Apply animation class for exit
+                modalContent.classList.remove('modal-animate-enter-active');
+                modalContent.classList.add('modal-animate-exit');
+
+                // Hide modal after animation completes
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                    modalContent.classList.remove('modal-animate-exit'); // Clean up exit class
+                }, 300); // Match animation duration
+            }
+        }
+        
+        /**
+         * Renders the entire menu dynamically onto the page.
+         */
+        function renderMenu() {
+            const groupedMenu = groupMenuByCategory(menuItems);
+            menuSectionsContainer.innerHTML = ''; // Clear existing content
+            categoryNav.innerHTML = ''; // Clear existing navigation links
+
+            Object.entries(groupedMenu).forEach(([category, items]) => {
+                const sectionId = category.toLowerCase().replace(/[^a-z0-9]/g, ''); // Simple ID generation
+                
+                // 1. Create Category Anchor Link
+                const navLink = document.createElement('a');
+                navLink.href = `#${sectionId}`;
+                navLink.textContent = category;
+                navLink.className = 'py-1 px-3 rounded-full hover:bg-espresso hover:text-cream transition duration-300 cursor-pointer';
+                
+                const navItem = document.createElement('li');
+                navItem.appendChild(navLink);
+                categoryNav.appendChild(navItem);
+                
+                // 2. Create Category Section (Anchor target)
+                const section = document.createElement('section');
+                section.id = sectionId;
+                section.className = 'pt-10 mb-12';
+                
+                // Section Title
+                const title = document.createElement('h2');
+                title.className = 'font-display text-4xl md:text-5xl font-light mb-8 pb-3 border-b-2 border-gold-accent inline-block';
+                title.textContent = category;
+                section.appendChild(title);
+
+                // Items Grid
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6';
+                
+                // 3. Create Item Cards
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    // Image-on-top card style
+                    card.className = 'bg-card-bg p-0 rounded-xl shadow-lg transition duration-300 cursor-pointer border border-gold-accent border-opacity-30 transform hover:scale-[1.02] hover:shadow-2xl group overflow-hidden';
+                    
+                    // Card structure with prominent top image and info below (downward)
+                    card.innerHTML = `
+                        <!-- Image Container (No frame/border). Height increased slightly for better image display. -->
+                        <div class="w-full h-48 overflow-hidden">
+                            <img src="${item.imageUrl}" alt="${item.name} image" onerror="this.onerror=null;this.src='https://placehold.co/400x200/3C2F2F/F5F5DC?text=Coffee';" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                        </div>
+                        
+                        <!-- Text/Info Container: Clean, only name and price -->
+                        <div class="p-4 md:p-5 flex justify-between items-center">
+                            <h3 class="font-display text-xl font-semibold text-espresso truncate">${item.name}</h3>
+                            <span class="font-bold text-lg text-gold-accent">${item.price}</span>
+                        </div>
+                        <!-- We removed the description and "Tap for Details" text completely for a cleaner look -->
+                    `;
+                    card.addEventListener('click', () => openModal(item));
+                    grid.appendChild(card);
+                });
+                
+                section.appendChild(grid);
+                menuSectionsContainer.appendChild(section);
+            });
+        }
+
+        // Run the rendering function when the window loads
+        window.onload = renderMenu;
+    </script>
+</body>
+</html>
